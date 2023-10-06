@@ -1,8 +1,8 @@
 import requests
 
 # API
-clientid = "630f5b8817e24c78851c57c24d7a36c0"
-secretkey = "c6716788751f471eb2ca9e79af8b7a1a"
+clientid = "enter clientid here"
+secretkey = "enter secret key here"
 
 # Auth Params
 auth_url = "https://cloudinfra-gw-us.portal.checkpoint.com/auth/external"
