@@ -1,4 +1,5 @@
 # Class Library for Check Point API.
+# Class Library with some fun tools, work in progress...
 # T. Lockman
 # February 2023
 # O_o tHe pAcKeTs nEvEr LiE o_O #
