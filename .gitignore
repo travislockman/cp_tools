@@ -1,0 +1,12 @@
+# Ignore these file extensions
+*.xls
+*.xlsm
+*.csv
+*.txt
+*.bak
+*.pdf
+*.ini
+*.zip
+__pycache__/
+.idea/
+scratch_pad*.py
