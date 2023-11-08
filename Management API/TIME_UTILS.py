@@ -7,7 +7,6 @@
 import datetime
 import pytz
 
-
 class Time_Utils:
 
     def epoch_utc(self):
