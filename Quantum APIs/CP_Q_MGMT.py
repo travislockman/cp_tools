@@ -252,7 +252,7 @@ class CPQMGMT:
                                           value in locals().items()
                                           if key != 'self'
                                           and value is not None})
-        http_response = self.post_full_request(self.build_url(GENERIC_OBJECT_QUERY),
+        http_response = self.post_full_request(self.build_url(GENERIC_OBJECT_SET),
                                                self.build_headers(),
                                                **parameters)
         json_response = http_response.json()
