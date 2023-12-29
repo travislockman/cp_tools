@@ -13,11 +13,15 @@ requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 ADD_HOST = '/add-host'
 ADD_NETWORK = '/add-network'
 ADD_RANGE = '/add-address-range'
+ADD_VPN_COMMUNITY_MESHED = '/add-vpn-community-meshed'
+ADD_VPN_COMMUNITY_STAR = '/add-vpn-community-star'
+ADD_INTEROPERABLE_DEVICE = '/add-interoperable-device'
 INSTALL_POLICY = '/install-policy'
 LOGOUT = '/logout'
 GENERIC_OBJECT_QUERY = '//show-generic-objects'
 GENERIC_OBJECT_SET = '//set-generic-object'
 PUBLISH = '/publish'
+SHOW_COMMANDS = '/show-commands'
 SHOW_DYNAMIC_OBJECT = '/show-dynamic-object'
 SHOW_DYNAMIC_OBJECTS = '/show-dynamic-objects'
 SHOW_UNUSED_OBJECTS = '/show-unused-objects'
@@ -27,6 +31,11 @@ SHOW_PACKAGES = '/show-packages'
 SHOW_SIMPLE_GATEWAYS = '/show-simple-gateways'
 SHOW_NAT_RULEBASE = '/show-nat-rulebase'
 SHOW_TASK = '/show-task'
+SHOW_VPN_COMMUNITY_MESHED = '/show-vpn-community-meshed'
+SHOW_VPN_COMMUNITIES_MESHED = '/show-vpn-communities-meshed'
+SHOW_VPN_COMMUNITY_STAR = '/show-vpn-community-star'
+SHOW_VPN_COMMUNITIES_STAR = '/show-vpn-communities-star'
+SHOW_INTEROPERABLE_DEVICES = '/show-interoperable-devices'
 TOKEN = '/login'
 
 class CPQMGMT:
@@ -43,6 +52,7 @@ class CPQMGMT:
     def convert_dashes(dictionary):
         for key in list(dictionary.keys()):
             new_key = key.replace("_", "-")
+            new_key = new_key.replace("--", ".")
             if new_key != key:
                 dictionary[new_key] = dictionary.pop(key)
         return dictionary
@@ -126,6 +136,32 @@ class CPQMGMT:
                                                **parameters)
         json_response = http_response.json()
         return json_response
+    
+    def add_interoperable_device(self, name, ip_address, domain_type, domain,
+                                 **kwargs):
+        '''
+        Looks like the newer version of the API will use dot notation maybe.
+        For now you have to pass the vpn-settings dictionary.
+        The domain type and domain are the key elements when you click on 
+        topology in the object.  Even thought they aren't required by the API
+        I made them mandatory here because they are almost always used.
+        The two options for domain_type are 'addresses_behind_gw' or 'manual'.
+        If you select 'addresses_behind_gw, you need to modify this code and
+        remove 'vpn-domain' below.  domain is the object name of the desired
+        network.
+        This was not documented in v1.8 of the API, had to go to past 1.9.
+        '''
+        parameters = {'name': name, 'ip-address': ip_address, 
+                      'vpn_settings': {'vpn-domain-type': domain_type, 
+                      'vpn-domain': domain}}
+        parameters.update(kwargs)
+        parameters = self.convert_dashes(parameters)
+        http_response = self.post_full_request(self.build_url
+                                               (ADD_INTEROPERABLE_DEVICE),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
 
     def add_range(self, name, ip_address_first, ip_address_last, groups=None,
                   color=None, comments=None):
@@ -149,6 +185,18 @@ class CPQMGMT:
         json_response = http_response.json()
         return json_response
 
+    def add_vpn_community_star(self, name, **kwargs):
+        parameters = {'name': name}
+        parameters.update(kwargs)
+        parameters = self.convert_dashes(parameters)
+        print(f'\n\nPARAMETERS HERE:\n{parameters}\n\n')
+        http_response = self.post_full_request(self.build_url
+                                               (ADD_VPN_COMMUNITY_STAR),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
+    
     def show_packages(self, limit=None, offset=None, details_level=None):
         parameters = self.convert_dashes({key: value for key, value in
                                           locals().items() if key != 'self'
@@ -223,7 +271,61 @@ class CPQMGMT:
                                                **parameters)
         json_response = http_response.json()
         return json_response
+    
+    def show_vpn_community_meshed(self, name, details_level=None):
+        parameters = self.convert_dashes({key: value for key,
+                                          value in locals().items()
+                                          if key != 'self' and
+                                          value is not None})
+        http_response = self.post_full_request(self.build_url
+                                               (SHOW_VPN_COMMUNITY_MESHED),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
+    
+    def show_vpn_communities_meshed(self, details_level=None):
+        parameters = self.convert_dashes({key: value for key,
+                                          value in locals().items()
+                                          if key != 'self' and
+                                          value is not None})
+        http_response = self.post_full_request(self.build_url
+                                               (SHOW_VPN_COMMUNITIES_MESHED),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
+    
+    def show_vpn_community_star(self, name, details_level=None):
+        parameters = self.convert_dashes({key: value for key,
+                                          value in locals().items()
+                                          if key != 'self' and
+                                          value is not None})
+        http_response = self.post_full_request(self.build_url
+                                               (SHOW_VPN_COMMUNITY_STAR),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
+    
+    def show_vpn_communities_star(self, details_level=None):
+        parameters = self.convert_dashes({key: value for key,
+                                          value in locals().items()
+                                          if key != 'self' and
+                                          value is not None})
+        http_response = self.post_full_request(self.build_url
+                                               (SHOW_VPN_COMMUNITIES_STAR),
+                                               self.build_headers(),
+                                               **parameters)
+        json_response = http_response.json()
+        return json_response
 
+    def show_commands(self, limit=500):
+        http_response = self.post_full_request(self.build_url(SHOW_COMMANDS),
+                                               self.build_headers())
+        json_response = http_response.json()
+        return json_response
+    
     def show_unused_objects(self, limit=500):
         http_response = self.post_full_request(self.build_url(SHOW_UNUSED_OBJECTS),
                                                self.build_headers())
@@ -247,14 +349,15 @@ class CPQMGMT:
         json_response = http_response.json()
         return json_response
 
-    def generic_object_set(self, name, details_level=None):
+    def generic_object_set(self, **kwargs):
+        print(f'THIS IS YOUR KWARGS: {kwargs}')
         parameters = self.convert_dashes({key: value for key,
                                           value in locals().items()
                                           if key != 'self'
                                           and value is not None})
         http_response = self.post_full_request(self.build_url(GENERIC_OBJECT_SET),
                                                self.build_headers(),
-                                               **parameters)
+                                               **kwargs)
         json_response = http_response.json()
         return json_response
 
